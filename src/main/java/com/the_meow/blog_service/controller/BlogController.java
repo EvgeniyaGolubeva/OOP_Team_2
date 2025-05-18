@@ -6,6 +6,8 @@ import com.the_meow.blog_service.utils.Utils;
 
 import jakarta.validation.Valid;
 
+import java.util.Map;
+
 import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -80,5 +82,29 @@ public class BlogController {
         return ResponseEntity.noContent().build();
     }
 
-    
+    @PatchMapping("/{id}/publish")
+    public ResponseEntity<Void> togglePublishStatus(
+            @PathVariable Integer id,
+            @RequestHeader("Authorization") String authHeader) throws BadRequestException {
+        Integer user_id = Utils.getUserId(authHeader);
+        if (user_id == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        service.togglePublish(id, user_id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/publish")
+    public ResponseEntity<Map<String, Boolean>> getPublishStatus(
+            @PathVariable Integer id,
+            @RequestHeader("Authorization") String authHeader) throws BadRequestException {
+        Integer user_id = Utils.getUserId(authHeader);
+        if (user_id == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        boolean isPublished = service.getPublishStatus(id, user_id);
+        return ResponseEntity.ok(Map.of("isPublished", isPublished));
+    }
 }

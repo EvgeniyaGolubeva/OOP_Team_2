@@ -78,7 +78,7 @@ public class BlogService {
             .userId(user_id)
             .thumbnailUrl(request.getThumbnailUrl())
             .content(request.getContent())
-            .isPublished(true)
+            .isPublished(false)
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .publishedAt(null)
@@ -155,5 +155,37 @@ public class BlogService {
         }
     
         repo.delete(blog);
-    }    
+    }
+
+    public void togglePublish(Integer blogId, Integer userId) throws BadRequestException {
+        Blog blog = repo.findById(blogId.longValue()).orElse(null);
+
+        if (blog == null) {
+            throw new BadRequestException("No blog found");
+        }
+        
+        if (!blog.getUserId().equals(userId)) {
+            throw new BadRequestException("Not yours, sorry :(");
+        }
+    
+        blog.setIsPublished(!blog.getIsPublished());
+        blog.setPublishedAt(blog.getIsPublished() ? LocalDateTime.now() : null);
+        blog.setUpdatedAt(LocalDateTime.now());
+    
+        repo.save(blog);
+    }
+    
+    public boolean getPublishStatus(Integer blogId, Integer userId) throws BadRequestException {
+        Blog blog = repo.findById(blogId.longValue()).orElse(null);
+
+        if (blog == null) {
+            throw new BadRequestException("No blog found");
+        }
+        
+        if (!blog.getUserId().equals(userId)) {
+            throw new BadRequestException("Not yours, sorry :(");
+        }
+    
+        return blog.getIsPublished();
+    }
 }
