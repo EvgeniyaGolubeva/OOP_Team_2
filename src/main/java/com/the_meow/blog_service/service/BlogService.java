@@ -2,17 +2,16 @@ package com.the_meow.blog_service.service;
 
 import com.the_meow.blog_service.dto.*;
 import com.the_meow.blog_service.model.*;
+import com.the_meow.blog_service.exception.*;
 import com.the_meow.blog_service.repository.*;
 
-import org.apache.coyote.BadRequestException;
-import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.data.domain.*;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
 
-import java.nio.file.AccessDeniedException;
-import java.time.LocalDateTime;
+import org.springframework.data.domain.*;
+import org.springframework.stereotype.Service;
+import org.springframework.data.jpa.domain.Specification;
+
 import java.util.List;
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,18 +28,23 @@ public class BlogService {
         if (filter.getTitle() != null && !filter.getTitle().isEmpty()) {
             spec = spec.and(BlogSpecifications.titleContains(filter.getTitle()));
         }
+        
         if (filter.getUserId() != null) {
             spec = spec.and(BlogSpecifications.hasUserId(filter.getUserId()));
         }
+
         if (filter.getTag() != null && !filter.getTag().isEmpty()) {
             spec = spec.and(BlogSpecifications.hasTag(filter.getTag()));
         }
+
         if (filter.getMinReadCount() != null) {
             spec = spec.and(BlogSpecifications.minReadCount(filter.getMinReadCount()));
         }
+
         if (filter.getPublishedAfter() != null) {
             spec = spec.and(BlogSpecifications.publishedAfter(filter.getPublishedAfter()));
         }
+
         if (filter.getPublishedBefore() != null) {
             spec = spec.and(BlogSpecifications.publishedBefore(filter.getPublishedBefore()));
         }
@@ -71,11 +75,21 @@ public class BlogService {
         return new PageImpl<>(summaries, pageable, blogs.getTotalElements());
     }
 
+    private Blog findBlogOwnedBy(Integer blogId, Integer userId) {
+        Blog blog = repo.findById(blogId.longValue())
+            .orElseThrow(() -> new BlogNotFoundException(blogId));
+    
+        if (!blog.getUserId().equals(userId)) {
+            throw new ForbiddenBlogAccessException(blogId, userId);
+        }
 
-    public BlogCreateResponse createNewBlog(BlogCreateRequest request, Integer user_id) {
+        return blog;
+    }    
+
+    public BlogCreateResponse createNewBlog(Integer userId, BlogCreateRequest request) {
         Blog blog = Blog.builder()
             .title(request.getTitle())
-            .userId(user_id)
+            .userId(userId)
             .thumbnailUrl(request.getThumbnailUrl())
             .content(request.getContent())
             .isPublished(false)
@@ -84,6 +98,7 @@ public class BlogService {
             .publishedAt(null)
             .readCount(0)
             .build();
+    
 
         if (request.getTags() != null && !request.getTags().isEmpty()) {
             List<Tag> tagEntities = request.getTags().stream()
@@ -94,35 +109,22 @@ public class BlogService {
                     return tag;
                 })
                 .toList();
+
             blog.setTags(tagEntities);
         }
 
-        try {
-            repo.save(blog);
-            return new BlogCreateResponse(
-                blog.getId(),
-                blog.getTitle(),
-                blog.getThumbnailUrl(),
-                request.getTags()
-            );        
-        }
-        catch (Exception e) {
-            return null;
-        }
+        repo.save(blog);
+        return new BlogCreateResponse(
+            blog.getId(),
+            blog.getTitle(),
+            blog.getThumbnailUrl(),
+            request.getTags()
+        );
     }
 
-    public BlogCreateResponse updateBlog(Integer blogId, Integer userId, BlogCreateRequest request) throws BadRequestException {
-        Blog blog = repo.findById(blogId.longValue()).orElse(null);
-
-        if (blog == null) {
-            throw new BadRequestException("No blog found");
-        }
-        
-        if (!blog.getUserId().equals(userId)) {
-            throw new BadRequestException("Not yours, sorry :(");
-        }
+    public BlogCreateResponse updateBlog(Integer blogId, Integer userId, BlogCreateRequest request) {
+        Blog blog = findBlogOwnedBy(blogId, userId);
     
-        // Update fields
         blog.setTitle(request.getTitle() != null ? request.getTitle() : blog.getTitle());
         blog.setThumbnailUrl(request.getThumbnailUrl() != null ? request.getThumbnailUrl() : blog.getThumbnailUrl());
         blog.setContent(request.getContent() != null ? request.getContent() : blog.getContent());
@@ -143,31 +145,14 @@ public class BlogService {
         );
     }
 
-    public void deleteBlog(Integer blogId, Integer userId) throws BadRequestException {
-        Blog blog = repo.findById(blogId.longValue()).orElse(null);
-
-        if (blog == null) {
-            throw new BadRequestException("No blog found");
-        }
-        
-        if (!blog.getUserId().equals(userId)) {
-            throw new BadRequestException("Not yours, sorry :(");
-        }
-    
+    public void deleteBlog(Integer blogId, Integer userId) {
+        Blog blog = findBlogOwnedBy(blogId, userId);
         repo.delete(blog);
     }
 
-    public void togglePublish(Integer blogId, Integer userId) throws BadRequestException {
-        Blog blog = repo.findById(blogId.longValue()).orElse(null);
+    public void togglePublish(Integer blogId, Integer userId) {
+        Blog blog = findBlogOwnedBy(blogId, userId);
 
-        if (blog == null) {
-            throw new BadRequestException("No blog found");
-        }
-        
-        if (!blog.getUserId().equals(userId)) {
-            throw new BadRequestException("Not yours, sorry :(");
-        }
-    
         blog.setIsPublished(!blog.getIsPublished());
         blog.setPublishedAt(blog.getIsPublished() ? LocalDateTime.now() : null);
         blog.setUpdatedAt(LocalDateTime.now());
@@ -175,17 +160,8 @@ public class BlogService {
         repo.save(blog);
     }
     
-    public boolean getPublishStatus(Integer blogId, Integer userId) throws BadRequestException {
-        Blog blog = repo.findById(blogId.longValue()).orElse(null);
-
-        if (blog == null) {
-            throw new BadRequestException("No blog found");
-        }
-        
-        if (!blog.getUserId().equals(userId)) {
-            throw new BadRequestException("Not yours, sorry :(");
-        }
-    
+    public boolean getPublishStatus(Integer blogId, Integer userId) {
+        Blog blog = findBlogOwnedBy(blogId, userId);
         return blog.getIsPublished();
     }
 }

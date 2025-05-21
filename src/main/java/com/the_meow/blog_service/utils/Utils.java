@@ -1,12 +1,22 @@
 package com.the_meow.blog_service.utils;
 
+import java.util.Optional;
+
 public class Utils {
-    public static Integer getUserId(String token) {
+    public static Optional<Integer> getUserId(String token) {
+        if (token == null) {
+            return Optional.of(null);
+        }
+
+        if (token.isBlank()) {
+            return Optional.of(null);
+        }
+
         try {
-            return Integer.parseInt(token);
+            return Optional.of(Integer.parseInt(token));
         }
         catch (NumberFormatException e) {
-            return null;
+            return Optional.of(null);
         }
     }
 }
