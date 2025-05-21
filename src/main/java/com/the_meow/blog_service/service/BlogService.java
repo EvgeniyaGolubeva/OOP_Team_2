@@ -4,13 +4,16 @@ import com.the_meow.blog_service.dto.*;
 import com.the_meow.blog_service.model.*;
 import com.the_meow.blog_service.exception.*;
 import com.the_meow.blog_service.repository.*;
+import com.the_meow.blog_service.utils.Utils;
 
+import jakarta.validation.Valid;
 
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
+import java.util.Optional;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
@@ -22,7 +25,7 @@ public class BlogService {
         this.repo = repo;
     }
 
-    public Page<BlogSummaryResponse> getPublishedBlogs(BlogFilterRequest filter) {
+    public Page<BlogInfoPublic> getPublishedBlogs(BlogFilterRequest filter) {
         Specification<Blog> spec = Specification.where(BlogSpecifications.isPublished());
 
         if (filter.getTitle() != null && !filter.getTitle().isEmpty()) {
@@ -52,22 +55,16 @@ public class BlogService {
         Pageable pageable = PageRequest.of(filter.getPage(), filter.getSize());
         Page<Blog> blogs = repo.findAll(spec, pageable);
 
-        List<BlogSummaryResponse> summaries = blogs.getContent().stream()
+        List<BlogInfoPublic> summaries = blogs.getContent().stream()
                 .map(blog -> {
-                    double avgRating = blog.getRatings() == null || blog.getRatings().isEmpty()
-                            ? 0.0
-                            : blog.getRatings().stream()
-                                .mapToDouble(BlogRating::getRating)
-                                .average()
-                                .orElse(0.0);
-
-                    return new BlogSummaryResponse(
-                            blog.getTitle(),
-                            blog.getUserId(),
-                            blog.getThumbnailUrl(),
-                            blog.getPublishedAt(),
-                            blog.getReadCount(),
-                            avgRating
+                    return new BlogInfoPublic(
+                        blog.getId(),
+                        blog.getTitle(),
+                        blog.getUserId(),
+                        blog.getThumbnailUrl(),
+                        blog.getPublishedAt(),
+                        blog.getTags().stream().map(Tag::getName).toList(),
+                        Utils.getAvgBlogRating(blog.getRatings())
                     );
                 })
                 .collect(Collectors.toList());
@@ -86,7 +83,7 @@ public class BlogService {
         return blog;
     }    
 
-    public BlogCreateResponse createNewBlog(Integer userId, BlogCreateRequest request) {
+    public BlogInfoOwner createNewBlog(Integer userId, BlogCreateRequest request) {
         Blog blog = Blog.builder()
             .title(request.getTitle())
             .userId(userId)
@@ -114,15 +111,11 @@ public class BlogService {
         }
 
         repo.save(blog);
-        return new BlogCreateResponse(
-            blog.getId(),
-            blog.getTitle(),
-            blog.getThumbnailUrl(),
-            request.getTags()
-        );
+
+        return new BlogInfoOwner(blog);
     }
 
-    public BlogCreateResponse updateBlog(Integer blogId, Integer userId, BlogCreateRequest request) {
+    public BlogInfoOwner updateBlog(Integer blogId, Integer userId, BlogCreateRequest request) {
         Blog blog = findBlogOwnedBy(blogId, userId);
     
         blog.setTitle(request.getTitle() != null ? request.getTitle() : blog.getTitle());
@@ -133,16 +126,7 @@ public class BlogService {
     
         repo.save(blog);
 
-        return new BlogCreateResponse(
-            blog.getId(),
-            blog.getTitle(),
-            blog.getThumbnailUrl(),
-            blog.getTags().stream()
-                .map(tag -> {
-                    return tag.getName();
-                })
-                .toList()
-        );
+        return new BlogInfoOwner(blog);
     }
 
     public void deleteBlog(Integer blogId, Integer userId) {
@@ -183,5 +167,20 @@ public class BlogService {
     public boolean getPublishStatus(Integer blogId, Integer userId) {
         Blog blog = findBlogOwnedBy(blogId, userId);
         return blog.getIsPublished();
+    }
+
+    public Object getBlog(Optional<Integer> userId, Integer blogId) {
+        Blog blog = repo.findById(blogId.longValue())
+            .orElseThrow(() -> new BlogNotFoundException(blogId));
+        
+        if (userId.isPresent() && blog.getUserId().equals(userId.get())) {
+            return new BlogInfoOwner(blog);
+        }
+    
+        if (Boolean.TRUE.equals(blog.getIsPublished())) {
+            return new BlogInfoPublic(blog);
+        }
+    
+        throw new ForbiddenBlogAccessException(blogId, userId.orElse(-1));
     }
 }

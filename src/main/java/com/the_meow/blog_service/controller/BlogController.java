@@ -8,16 +8,13 @@ import com.the_meow.blog_service.utils.Utils;
 import jakarta.validation.Valid;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-// TODO: make it better
-// TODO: this is shitty, I know
-// TODO: Will be fixed, I promise
 
 @RestController
 @RequestMapping("/api/blog")
@@ -30,29 +27,38 @@ public class BlogController {
     }
 
     @GetMapping
-    public Page<BlogSummaryResponse> getAllPublishedBlogs(@ModelAttribute BlogFilterRequest filter) {
+    public Page<BlogInfoPublic> getAllPublishedBlogs(@ModelAttribute BlogFilterRequest filter) {
         return service.getPublishedBlogs(filter);
+    }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getBlog(
+        @PathVariable Integer id,
+        @RequestHeader("Authorization") String authHeader
+    ) {
+        Optional<Integer> userId = Utils.getUserId(authHeader);
+        Object blog = service.getBlog(userId, id);
+        return ResponseEntity.ok(blog);
     }
 
     @PostMapping
-    public ResponseEntity<BlogCreateResponse> createBlog(
+    public ResponseEntity<BlogInfoOwner> createBlog(
         @Valid @RequestBody BlogCreateRequest request,
         @RequestHeader("Authorization") String authHeader
     ) {
         Integer userId = Utils.getUserId(authHeader).orElseThrow(BadAuthTokenException::new);
-        BlogCreateResponse savedBlog = service.createNewBlog(userId, request);
+        BlogInfoOwner savedBlog = service.createNewBlog(userId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedBlog);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<BlogCreateResponse> updateBlog(
+    public ResponseEntity<BlogInfoOwner> updateBlog(
             @PathVariable Integer id,
             @RequestBody BlogCreateRequest request,
             @RequestHeader("Authorization") String authHeader
     ) throws BadRequestException {
         Integer userId = Utils.getUserId(authHeader).orElseThrow(BadAuthTokenException::new);
-        BlogCreateResponse updatedBlog = service.updateBlog(id, userId, request);
+        BlogInfoOwner updatedBlog = service.updateBlog(id, userId, request);
         return ResponseEntity.ok(updatedBlog);
     }
 
@@ -72,7 +78,6 @@ public class BlogController {
         @RequestHeader("Authorization") String authHeader
     ) {
         Integer userId = Utils.getUserId(authHeader).orElseThrow(BadAuthTokenException::new);
-
         boolean isPublished = service.getPublishStatus(id, userId);
         return ResponseEntity.ok(Map.of("isPublished", isPublished));
     }
