@@ -66,18 +66,6 @@ public class BlogController {
         return ResponseEntity.noContent().build();
     }
 
-
-    @PatchMapping("/{id}/publish")
-    public ResponseEntity<Void> togglePublishStatus(
-        @PathVariable Integer id,
-        @RequestHeader("Authorization") String authHeader
-    ) {
-        Integer userId = Utils.getUserId(authHeader).orElseThrow(BadAuthTokenException::new);
-
-        service.togglePublish(id, userId);
-        return ResponseEntity.noContent().build();
-    }
-
     @GetMapping("/{id}/publish")
     public ResponseEntity<Map<String, Boolean>> getPublishStatus(
         @PathVariable Integer id,
@@ -87,5 +75,35 @@ public class BlogController {
 
         boolean isPublished = service.getPublishStatus(id, userId);
         return ResponseEntity.ok(Map.of("isPublished", isPublished));
+    }
+
+    @PostMapping("/{id}/publish")
+    public ResponseEntity<Void> publishBlog(
+        @PathVariable Integer id,
+        @RequestHeader("Authorization") String authHeader
+    ) {
+        Integer userId = Utils.getUserId(authHeader).orElseThrow(BadAuthTokenException::new);
+        service.publishBlog(id, userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/publish")
+    public ResponseEntity<Void> togglePublish(
+        @PathVariable Integer id,
+        @RequestHeader("Authorization") String authHeader
+    ) {
+        Integer userId = Utils.getUserId(authHeader).orElseThrow(BadAuthTokenException::new);
+        service.togglePublish(id, userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}/publish")
+    public ResponseEntity<Void> unpublishBlog(
+        @PathVariable Integer id,
+        @RequestHeader("Authorization") String authHeader
+    ) {
+        Integer userId = Utils.getUserId(authHeader).orElseThrow(BadAuthTokenException::new);
+        service.unpublishBlog(id, userId);
+        return ResponseEntity.noContent().build();
     }
 }

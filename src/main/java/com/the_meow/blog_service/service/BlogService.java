@@ -28,7 +28,7 @@ public class BlogService {
         if (filter.getTitle() != null && !filter.getTitle().isEmpty()) {
             spec = spec.and(BlogSpecifications.titleContains(filter.getTitle()));
         }
-        
+
         if (filter.getUserId() != null) {
             spec = spec.and(BlogSpecifications.hasUserId(filter.getUserId()));
         }
@@ -148,6 +148,26 @@ public class BlogService {
     public void deleteBlog(Integer blogId, Integer userId) {
         Blog blog = findBlogOwnedBy(blogId, userId);
         repo.delete(blog);
+    }
+
+    public void publishBlog(Integer blogId, Integer userId) {
+        Blog blog = findBlogOwnedBy(blogId, userId);
+
+        blog.setIsPublished(true);
+        blog.setPublishedAt(LocalDateTime.now());
+        blog.setUpdatedAt(LocalDateTime.now());
+    
+        repo.save(blog);
+    }
+
+    public void unpublishBlog(Integer blogId, Integer userId) {
+        Blog blog = findBlogOwnedBy(blogId, userId);
+
+        blog.setIsPublished(false);
+        blog.setPublishedAt(null);
+        blog.setUpdatedAt(LocalDateTime.now());
+    
+        repo.save(blog);
     }
 
     public void togglePublish(Integer blogId, Integer userId) {
