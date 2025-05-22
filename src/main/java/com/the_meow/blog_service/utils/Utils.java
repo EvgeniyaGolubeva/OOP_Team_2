@@ -1,9 +1,10 @@
 package com.the_meow.blog_service.utils;
 
+import java.util.Collection;
 import java.util.Optional;
-import java.util.Set;
 
 import com.the_meow.blog_service.model.BlogRating;
+import com.the_meow.blog_service.model.CommentRating;
 
 public class Utils {
     public static Optional<Integer> getUserId(String token) {
@@ -23,9 +24,17 @@ public class Utils {
         }
     }
 
-    public static Double getAvgBlogRating(Set<BlogRating> ratings) {
+    public static Double getAvgBlogRating(Collection<BlogRating> ratings) {
         return ratings.stream()
             .map(BlogRating::getRating)
+            .map(Double::valueOf)
+            .mapToDouble(Double::doubleValue)
+            .average().getAsDouble();
+    }
+
+    public static Double getAvgCommentRating(Collection<CommentRating> ratings) {
+        return ratings.stream()
+            .map(CommentRating::getRating)
             .map(Double::valueOf)
             .mapToDouble(Double::doubleValue)
             .average().getAsDouble();
