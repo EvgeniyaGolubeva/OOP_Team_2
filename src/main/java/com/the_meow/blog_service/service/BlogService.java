@@ -6,8 +6,6 @@ import com.the_meow.blog_service.exception.*;
 import com.the_meow.blog_service.repository.*;
 import com.the_meow.blog_service.utils.Utils;
 
-import jakarta.validation.Valid;
-
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.data.jpa.domain.Specification;

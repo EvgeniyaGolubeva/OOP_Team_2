@@ -17,7 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/blog")
+@RequestMapping("/api/v1/blogs")
 public class BlogController {
 
     private final BlogService service;
