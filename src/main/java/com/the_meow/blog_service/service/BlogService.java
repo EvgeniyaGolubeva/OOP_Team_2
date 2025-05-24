@@ -12,6 +12,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 import java.util.Optional;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
@@ -54,17 +55,7 @@ public class BlogService {
         Page<Blog> blogs = repo.findAll(spec, pageable);
 
         List<BlogInfoPublic> summaries = blogs.getContent().stream()
-                .map(blog -> {
-                    return new BlogInfoPublic(
-                        blog.getId(),
-                        blog.getTitle(),
-                        blog.getUserId(),
-                        blog.getThumbnailUrl(),
-                        blog.getPublishedAt(),
-                        blog.getTags().stream().map(Tag::getName).toList(),
-                        Utils.getAvgBlogRating(blog.getRatings())
-                    );
-                })
+                .map(blog -> new BlogInfoPublic(blog))
                 .collect(Collectors.toList());
 
         return new PageImpl<>(summaries, pageable, blogs.getTotalElements());
@@ -81,12 +72,14 @@ public class BlogService {
         return blog;
     }    
 
-    public BlogInfoOwner createNewBlog(Integer userId, BlogCreateRequest request) {
+    public BlogInfoOwner createNewBlog(Integer userId, BlogCreateRequest request) throws IOException {
+        String content = Utils.compressText(Optional.ofNullable(request.getContent()).orElse(""));
+
         Blog blog = Blog.builder()
             .title(request.getTitle())
             .userId(userId)
             .thumbnailUrl(request.getThumbnailUrl())
-            .content(request.getContent())
+            .content(content)
             .isPublished(false)
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
@@ -113,12 +106,12 @@ public class BlogService {
         return new BlogInfoOwner(blog);
     }
 
-    public BlogInfoOwner updateBlog(Integer blogId, Integer userId, BlogCreateRequest request) {
+    public BlogInfoOwner updateBlog(Integer blogId, Integer userId, BlogCreateRequest request) throws IOException {
         Blog blog = findBlogOwnedBy(blogId, userId);
     
         blog.setTitle(request.getTitle() != null ? request.getTitle() : blog.getTitle());
         blog.setThumbnailUrl(request.getThumbnailUrl() != null ? request.getThumbnailUrl() : blog.getThumbnailUrl());
-        blog.setContent(request.getContent() != null ? request.getContent() : blog.getContent());
+        blog.setContent(request.getContent() != null ? Utils.compressText(request.getContent()) : blog.getContent());
         blog.setIsPublished(false);
         blog.setUpdatedAt(LocalDateTime.now());
     
@@ -172,11 +165,11 @@ public class BlogService {
             .orElseThrow(() -> new BlogNotFoundException(blogId));
         
         if (userId.isPresent() && blog.getUserId().equals(userId.get())) {
-            return new BlogInfoOwner(blog);
+            return new BlogOwner(blog);
         }
     
         if (Boolean.TRUE.equals(blog.getIsPublished())) {
-            return new BlogInfoPublic(blog);
+            return new BlogPublic(blog);
         }
     
         throw new ForbiddenBlogAccessException(blogId, userId.orElse(-1));

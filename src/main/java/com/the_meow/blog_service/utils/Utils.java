@@ -47,7 +47,7 @@ public class Utils {
             .average().getAsDouble();
     }
 
-    public String compressText(String text) throws IOException {
+    public static String compressText(String text) throws IOException {
         if (text.length() <= 100) {
             return text;
         }
@@ -61,7 +61,7 @@ public class Utils {
         return Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray());
     }
 
-    public String decompressText(String text) {
+    public static String decompressText(String text) {
         if (text == null || text.isEmpty()) {
             return text;
         }

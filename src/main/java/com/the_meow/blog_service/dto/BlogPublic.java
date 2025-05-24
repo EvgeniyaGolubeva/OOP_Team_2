@@ -25,7 +25,7 @@ public class BlogPublic {
     public BlogPublic(Blog blog) {
         this.id = blog.getId();
         this.title = blog.getTitle();
-        this.content = blog.getContent();
+        this.content = Utils.decompressText(blog.getContent());
         this.ownerId = blog.getUserId();
         this.thumbnailUrl = blog.getThumbnailUrl();
         this.publishedAt = blog.getPublishedAt();

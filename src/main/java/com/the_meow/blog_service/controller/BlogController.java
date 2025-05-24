@@ -7,10 +7,10 @@ import com.the_meow.blog_service.utils.Utils;
 
 import jakarta.validation.Valid;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +45,7 @@ public class BlogController {
     public ResponseEntity<BlogInfoOwner> createBlog(
         @Valid @RequestBody BlogCreateRequest request,
         @RequestHeader("Authorization") String authHeader
-    ) {
+    ) throws IOException {
         Integer userId = Utils.getUserId(authHeader).orElseThrow(BadAuthTokenException::new);
         BlogInfoOwner savedBlog = service.createNewBlog(userId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedBlog);
@@ -56,7 +56,7 @@ public class BlogController {
             @PathVariable Integer id,
             @RequestBody BlogCreateRequest request,
             @RequestHeader("Authorization") String authHeader
-    ) throws BadRequestException {
+    ) throws IOException {
         Integer userId = Utils.getUserId(authHeader).orElseThrow(BadAuthTokenException::new);
         BlogInfoOwner updatedBlog = service.updateBlog(id, userId, request);
         return ResponseEntity.ok(updatedBlog);
