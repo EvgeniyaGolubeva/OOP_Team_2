@@ -1,1 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Създай статия</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <h1>Напиши нова статия</h1>
+    <form action="/blog" method="post">
+        <label for="title">Заглавие:</label>
+        <input type="text" id="title" name="title" required>
+        
+        <label for="content">Съдържание (Markdown):</label>
+        <textarea id="content" name="content" rows="10" required></textarea>
+        
+        <button type="submit">Публикувай</button>
+    </form>
+</body>
+</html>
 
