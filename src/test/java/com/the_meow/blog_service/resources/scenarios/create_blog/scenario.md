@@ -12,7 +12,7 @@ Parameter | Value
 Version | 1.0
 Author | QA 
 Date | 24/05/2025
-Status | Draft
+Status | Waiting for Review
 Last Updated | 24/05/2025
 
 ## 2. Documentation
