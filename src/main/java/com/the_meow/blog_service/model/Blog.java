@@ -36,9 +36,11 @@ public class Blog {
 
     private Integer readCount = 0;
 
+    @Singular
     @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
+    @Singular
     @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tag> tags;
 
