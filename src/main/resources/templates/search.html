@@ -1,1 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Търсене на статии</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <h1>Търсене на статии</h1>
+    <form action="/search" method="get">
+        <input type="text" name="keyword" placeholder="Въведи ключова дума">
+        <input type="number" name="maxReadingTime" placeholder="Макс. време за четене">
+        <button type="submit">Търси</button>
+    </form>
+
+    <h2>Резултати:</h2>
+    <ul>
+        <li th:each="post : ${results}">
+            <a th:href="@{/blog/{id}(id=${post.id})}" th:text="${post.title}"></a>
+            <span th:text="${post.readingTime} + ' мин'"></span>
+        </li>
+    </ul>
+</body>
+</html>
 
