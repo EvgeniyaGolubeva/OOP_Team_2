@@ -13,10 +13,21 @@ public class BlogPost {
         calculateReadingTime();
     }
 
-    public void calculateReadingTime() {
-        int wordsPerMinute = 200; // Средна скорост на четене
-        int wordCount = content.split("\\s+").length;
-        this.readingTime = (int) Math.ceil((double) wordCount / wordsPerMinute);
+     public int estimateReadingTimeAdvanced(String content) {
+        int wordsPerMinute = 200;
+        String[] paragraphs = content.split("\n\n"); 
+        int totalTime = 0;
+
+        for (String paragraph : paragraphs) {
+            int wordCount = paragraph.split("\\s+").length;
+            int sentenceCount = paragraph.split("[.!?]").length;
+            double complexityFactor = (double) wordCount / sentenceCount;
+
+            int adjustedTime = (int) Math.ceil((wordCount / wordsPerMinute) * (1 + complexityFactor * 0.1));
+            totalTime += adjustedTime;
+        }
+
+        return totalTime;
     }
 
     public String getTitle() {
