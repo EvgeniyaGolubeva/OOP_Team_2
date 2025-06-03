@@ -21,5 +21,9 @@ public class BlogService {
         }
         return imageUrls;
     }
+
+    public static void updateReadingTime(BlogPost post) {
+        post.readingTime = post.estimateReadingTimeAdvanced(post.getContent());
+    }
 }
 
