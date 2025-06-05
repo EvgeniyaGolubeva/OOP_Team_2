@@ -6,7 +6,7 @@ import jakarta.mail.internet.InternetAddress;
 import java.util.ArrayList;
 
 public abstract class PersonTagUtil {
-    public static ArrayList<String> parse_blog(Blog blog) {
+    public static void parse_blog_and_notify(Blog blog) {
         ArrayList<String> validEmails = new ArrayList<>();
         String text = blog.getContent();
 
@@ -35,8 +35,6 @@ public abstract class PersonTagUtil {
         }
 
         NotificationUtil.fake_notify_users(validEmails);
-
-        return validEmails;
     }
 
     public static boolean isValidEmail(String email) {
