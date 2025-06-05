@@ -6,9 +6,8 @@ import jakarta.mail.internet.InternetAddress;
 import java.util.ArrayList;
 
 public abstract class PersonTagUtil {
-    public static void parse_blog_and_notify(Blog blog) {
+    public static void parse_blog_and_notify(String text) {
         ArrayList<String> validEmails = new ArrayList<>();
-        String text = blog.getContent();
 
         int i = 0;
         while (i < text.length()) {
