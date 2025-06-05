@@ -12,11 +12,11 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 
 public abstract class NotificationUtil {
-    public static void notify_user(ArrayList<Long> userIDs) throws URISyntaxException, IOException, InterruptedException {
+    public static void notify_users(ArrayList<String> emails) throws URISyntaxException, IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
 
         ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(userIDs);
+        String json = mapper.writeValueAsString(emails);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI("http://notification/api/notify" )) // the url should be something like this
@@ -29,11 +29,11 @@ public abstract class NotificationUtil {
         if (response.statusCode() != 200) {
             System.out.println("Status code: " + response.statusCode());
             System.out.println("Body: " + response.body());
-            System.out.println("Error notifying the users with the following ids: " + userIDs);
+            System.out.println("Error notifying the users with the following ids: " + emails);
         }
    }
 
-   public static void fake_notify_user(Long userID) {
-        System.out.println("The user with id: " + userID +  " was notified");
+   public static void fake_notify_users(ArrayList<String> userIDs) {
+        System.out.println("The user with id: " + userIDs +  " was notified");
    }
 }
