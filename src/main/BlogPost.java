@@ -5,6 +5,7 @@ public class BlogPost {
     private String content;
     private int readingTime;
     private LocalDateTime createdAt;
+    private List<String> tags;
 
     public BlogPost(String title, String content) {
         this.title = title;
@@ -29,6 +30,12 @@ public class BlogPost {
 
         return totalTime;
     }
+
+    public void generateTags() {
+        this.tags = BlogService.generateTags(content);
+    }
+
+    public List<String> getTags() { return tags; }
 
     public String getTitle() {
         return title;
