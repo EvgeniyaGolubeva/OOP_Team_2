@@ -25,5 +25,23 @@ public class BlogService {
     public static void updateReadingTime(BlogPost post) {
         post.readingTime = post.estimateReadingTimeAdvanced(post.getContent());
     }
-}
 
+    private static final Set<String> STOP_WORDS = Set.of("и", "в", "на", "за", "с", "от", "по");
+    
+    public static List<String> generateTags(String content) {
+        Map<String, Integer> wordFrequency = new HashMap<>();
+        String[] words = content.toLowerCase().replaceAll("[^a-zа-я]", " ").split("\\s+");
+
+        for (String word : words) {
+            if (!STOP_WORDS.contains(word) && word.length() > 3) {
+                wordFrequency.put(word, wordFrequency.getOrDefault(word, 0) + 1);
+            }
+        }
+
+        return wordFrequency.entrySet().stream()
+                .sorted((a, b) -> b.getValue() - a.getValue()) // Сортиране по честота
+                .limit(5) // Ограничаваме до 5 ключови тагове
+                .map(Map.Entry::getKey)
+                .toList();
+    }
+}
