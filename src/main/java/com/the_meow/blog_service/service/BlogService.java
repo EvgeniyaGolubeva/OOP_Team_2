@@ -201,6 +201,19 @@ public class BlogService {
         );
     }
 
+    public void submitRating(Integer blogId, Integer userId, RatingRequest ratingRequest) {
+        Blog blog = repo.findById(blogId.longValue())
+            .orElseThrow(() -> new BlogNotFoundException(blogId));
+            
+        boolean exists = blogRatingRepository.findByBlogIdAndUserId(blogId, userId).isPresent();
+        if (exists) {
+            throw new AlreadyRatedException();
+        }
+    
+        BlogRating rating = new BlogRating(blog, userId, ratingRequest.getRating().floatValue());
+        blogRatingRepository.save(rating);
+    }    
+
     public void updateRating(Integer blogId, Integer userId, RatingRequest ratingRequest) {
         BlogRating rating = blogRatingRepository.findByBlogIdAndUserId(blogId, userId)
             .orElseThrow(RatingNotFoundException::new);
