@@ -200,5 +200,15 @@ public class BlogService {
             userRating
         );
     }
-    
+
+
+    public void deleteRating(Integer blogId, Integer userId) {
+        BlogRating.BlogRatingId id = new BlogRating.BlogRatingId(blogId, userId);
+
+        if (!blogRatingRepository.existsById(id)) {
+            throw new RatingNotFoundException();
+        }
+
+        blogRatingRepository.deleteById(id);
+    }
 }
