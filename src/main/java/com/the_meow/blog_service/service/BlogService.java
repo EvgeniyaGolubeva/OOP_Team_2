@@ -19,9 +19,11 @@ import java.util.stream.Collectors;
 @Service
 public class BlogService {
     private final BlogRepository repo;
+    private final BlogRatingRepository blogRatingRepository;
 
-    public BlogService(BlogRepository repo) {
+    public BlogService(BlogRepository repo, BlogRatingRepository blogRatingRepository) {
         this.repo = repo;
+        this.blogRatingRepository = blogRatingRepository;
     }
 
     public Page<BlogInfoPublic> getPublishedBlogs(BlogFilterRequest filter) {
@@ -73,13 +75,18 @@ public class BlogService {
     }    
 
     public BlogInfoOwner createNewBlog(Integer userId, BlogCreateRequest request) throws IOException {
+        boolean titleExists = repo.existsByTitleAndUserId(request.getTitle(), userId);
+        if (titleExists) {
+            throw new DuplicateTitleException(request.getTitle(), userId);
+        }
+
         String content = Utils.compressText(Optional.ofNullable(request.getContent()).orElse(""));
 
         Blog blog = Blog.builder()
             .title(request.getTitle())
             .userId(userId)
             .thumbnailUrl(request.getThumbnailUrl())
-            .content(content)
+            .content(Optional.ofNullable(request.getContent()).orElse(""))
             .isPublished(false)
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
@@ -174,4 +181,24 @@ public class BlogService {
     
         throw new ForbiddenBlogAccessException(blogId, userId.orElse(-1));
     }
+
+    public RatingResponse getRating(Integer blogId, Integer userId) {
+        Double avg = blogRatingRepository.findAverageRatingByBlogId(blogId);
+        Integer total = blogRatingRepository.countByBlogId(blogId);
+    
+        Integer userRating = null;
+        if (userId != null) {
+            userRating = blogRatingRepository.findByBlogIdAndUserId(blogId, userId)
+                            .map(BlogRating::getRating)
+                            .map(Float::intValue)
+                            .orElse(null);
+        }
+    
+        return new RatingResponse(
+            avg != null ? avg : 0.0,
+            total != null ? total : 0,
+            userRating
+        );
+    }
+    
 }
