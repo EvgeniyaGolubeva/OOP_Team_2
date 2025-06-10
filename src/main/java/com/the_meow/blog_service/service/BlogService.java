@@ -201,6 +201,13 @@ public class BlogService {
         );
     }
 
+    public void updateRating(Integer blogId, Integer userId, RatingRequest ratingRequest) {
+        BlogRating rating = blogRatingRepository.findByBlogIdAndUserId(blogId, userId)
+            .orElseThrow(RatingNotFoundException::new);
+    
+        rating.setRating(ratingRequest.getRating().floatValue());
+        blogRatingRepository.save(rating);
+    }    
 
     public void deleteRating(Integer blogId, Integer userId) {
         BlogRating.BlogRatingId id = new BlogRating.BlogRatingId(blogId, userId);
