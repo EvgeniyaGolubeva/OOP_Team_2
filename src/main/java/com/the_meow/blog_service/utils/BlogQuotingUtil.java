@@ -10,7 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
-public abstract class BlogQuotingUtil {
+public class BlogQuotingUtil {
 
     private final BlogRepository blogRepository;
 
