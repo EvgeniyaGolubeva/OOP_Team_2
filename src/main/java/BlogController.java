@@ -1,6 +1,7 @@
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 import java.util.List;
+package com.example.blog; 
 
 @RestController
 @RequestMapping("/api/blogs")
