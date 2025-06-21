@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Статия</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <h1 th:text="${post.title}"></h1>
+    <p th:utext="${post.content}"></p>
+    
+    <p>Време за четене: <span th:text="${post.readingTime}"></span> мин.</p>
+
+    <p>Тагове: <span th:each="tag : ${post.tags}" th:text="${tag}"></span></p>
+    
+    <a href="/blog">⬅ Назад</a>
+</body>
+</html>
