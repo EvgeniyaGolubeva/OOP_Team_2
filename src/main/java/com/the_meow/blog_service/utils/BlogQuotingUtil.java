@@ -33,12 +33,12 @@ public class BlogQuotingUtil {
      * Invalid or malformed quotes (e.g. nonexistent blog, null content, or substring mismatch) are skipped silently.
      * <p>
      * @param inputText the blog content potentially containing quote references
-     * @return a list of integers in groups of 3: blog ID, start index, and end index of each valid quote,
+     * @return a list of longs in groups of 3: blog ID, start index (1 based), and end index (1 based) of each valid quote,
      *         or {@code null} if no valid quotes are found
      */
-    public ArrayList<Integer> validateQuotedBlogs(String inputText) {
+    public ArrayList<Long> validateQuotedBlogs(String inputText) {
         Matcher matcher = QUOTE_PATTERN.matcher(inputText);
-        ArrayList<Integer> positions = new ArrayList<>();
+        ArrayList<Long> positions = new ArrayList<>();
 
         while (matcher.find()) {
             long blogId = Long.parseLong(matcher.group(1));
@@ -49,13 +49,13 @@ public class BlogQuotingUtil {
                 continue;
             }
 
-            int startIndex = referencedBlog.getContent().indexOf(quotedText);
-            if (startIndex == -1) {
+            long startIndex = referencedBlog.getContent().indexOf(quotedText) + 1;
+            if (startIndex == 0) { // -1 + 1 = 0
                 continue;
             }
 
-            int endIndex = startIndex + quotedText.length();
-            positions.add(Math.toIntExact(blogId));
+            long endIndex = startIndex + quotedText.length();
+            positions.add(blogId);
             positions.add(startIndex);
             positions.add(endIndex);
         }
