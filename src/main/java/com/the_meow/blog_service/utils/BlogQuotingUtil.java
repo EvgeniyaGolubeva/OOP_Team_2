@@ -3,12 +3,22 @@ package com.the_meow.blog_service.utils;
 import com.the_meow.blog_service.model.Blog;
 import com.the_meow.blog_service.repository.BlogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Component
 public abstract class BlogQuotingUtil {
+
+    private final BlogRepository blogRepository;
+
+    @Autowired
+    public BlogQuotingUtil(BlogRepository blogRepository) {
+        this.blogRepository = blogRepository;
+    }
+
     private static final Pattern QUOTE_PATTERN = Pattern.compile("\\[\\[\\((\\d+)\\)\\s(.+?)]]");
 
     /**
@@ -26,7 +36,7 @@ public abstract class BlogQuotingUtil {
      * @return a list of integers in groups of 3: blog ID, start index, and end index of each valid quote,
      *         or {@code null} if no valid quotes are found
      */
-    public ArrayList<Integer> validateQuotedBlogs(String inputText, BlogRepository blogRepository) {
+    public ArrayList<Integer> validateQuotedBlogs(String inputText) {
         Matcher matcher = QUOTE_PATTERN.matcher(inputText);
         ArrayList<Integer> positions = new ArrayList<>();
 
