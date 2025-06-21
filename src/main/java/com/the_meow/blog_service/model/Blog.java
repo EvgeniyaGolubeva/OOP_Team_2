@@ -30,10 +30,12 @@ public class Blog {
 
     private LocalDateTime updatedAt;
 
+    @Builder.Default
     private Boolean isPublished = false;
 
     private LocalDateTime publishedAt;
 
+    @Builder.Default
     private Integer readCount = 0;
 
     @Singular

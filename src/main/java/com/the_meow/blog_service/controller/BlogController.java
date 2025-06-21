@@ -111,46 +111,4 @@ public class BlogController {
         service.unpublishBlog(id, userId);
         return ResponseEntity.noContent().build();
     }
-
-    @GetMapping("/{id}/rating")
-    public ResponseEntity<RatingResponse> getRating(
-        @PathVariable Integer id,
-        @RequestHeader("Authorization") String authHeader
-    ) {
-        Integer userId = Utils.getUserId(authHeader).orElse(null);
-        RatingResponse rating = service.getRating(id, userId);
-        return ResponseEntity.ok(rating);
-    }
-    
-    @PostMapping("/{id}/rating")
-    public ResponseEntity<Void> submitRating(
-        @PathVariable Integer id,
-        @Valid @RequestBody RatingRequest ratingRequest,
-        @RequestHeader("Authorization") String authHeader
-    ) {
-        Integer userId = Utils.getUserId(authHeader).orElseThrow(BadAuthTokenException::new);
-        service.submitRating(id, userId, ratingRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-    
-    @PutMapping("/{id}/rating")
-    public ResponseEntity<Void> updateRating(
-        @PathVariable Integer id,
-        @Valid @RequestBody RatingRequest ratingRequest,
-        @RequestHeader("Authorization") String authHeader
-    ) {
-        Integer userId = Utils.getUserId(authHeader).orElseThrow(BadAuthTokenException::new);
-        service.updateRating(id, userId, ratingRequest);
-        return ResponseEntity.noContent().build();
-    }
-    
-    @DeleteMapping("/{id}/rating")
-    public ResponseEntity<Void> deleteRating(
-        @PathVariable Integer id,
-        @RequestHeader("Authorization") String authHeader
-    ) {
-        Integer userId = Utils.getUserId(authHeader).orElseThrow(BadAuthTokenException::new);
-        service.deleteRating(id, userId);
-        return ResponseEntity.noContent().build();
-    }
 }
