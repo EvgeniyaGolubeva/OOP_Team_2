@@ -1,4 +1,5 @@
 import java.time.LocalDateTime;
+package com.example.blog; 
 
 public class BlogPost {
     private String title;
