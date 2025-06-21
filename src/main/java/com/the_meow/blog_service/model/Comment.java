@@ -8,6 +8,7 @@ import java.util.Set;
 @Entity
 @Table(name = "comments")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Comment {

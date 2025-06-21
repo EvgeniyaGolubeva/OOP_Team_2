@@ -1,47 +1,74 @@
 package com.the_meow.blog_service.controller;
 
-import com.the_meow.blog_service.model.Comment;
+import com.the_meow.blog_service.dto.CommentCreate;
+import com.the_meow.blog_service.dto.CommentResponse;
+import com.the_meow.blog_service.exception.BadAuthTokenException;
 import com.the_meow.blog_service.service.CommentService;
-import lombok.RequiredArgsConstructor;
+import com.the_meow.blog_service.utils.Utils;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/comments")
-@RequiredArgsConstructor
+@RequestMapping("/api/v1/blogs/{blogId}/comments")
 public class CommentController {
 
-    private final CommentService commentService;
+    private final CommentService service;
+
+    public CommentController(CommentService service) {
+        this.service = service;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<CommentResponse>> getComments(
+        @PathVariable Integer blogId
+    ) {
+        List<CommentResponse> comments = service.getCommentsByBlogId(blogId);
+        return ResponseEntity.ok(comments);
+    }
 
     @PostMapping
-    public ResponseEntity<Comment> createComment(@RequestBody Comment comment) {
-        return ResponseEntity.ok(commentService.save(comment));
+    public ResponseEntity<CommentResponse> createComment(
+        @PathVariable Integer blogId,
+        @RequestBody CommentCreate commentCreate,
+        @RequestHeader("Authorization") String authHeader
+    ) {
+        Integer userId = Utils.getUserId(authHeader).orElseThrow(BadAuthTokenException::new);
+        CommentResponse comment = service.createComment(blogId, userId, commentCreate);
+        return ResponseEntity.ok(comment);
     }
 
-    @GetMapping("/blog/{blogId}")
-    public ResponseEntity<List<Comment>> getCommentsByBlog(@PathVariable Integer blogId) {
-        return ResponseEntity.ok(commentService.getCommentsByBlogId(blogId));
+    @GetMapping("/{commentId}")
+    public ResponseEntity<CommentResponse> getCommentById(
+        @PathVariable Integer blogId,
+        @PathVariable Integer commentId
+    ) {
+        CommentResponse comment = service.getCommentById(blogId, commentId);
+        return ResponseEntity.ok(comment);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Comment> getCommentById(@PathVariable Integer id) {
-        return commentService.getCommentsByBlogId(id).stream()
-                .findFirst()
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @PatchMapping("/{commentId}")
+    public ResponseEntity<CommentResponse> updateComment(
+        @PathVariable Integer blogId,
+        @PathVariable Integer commentId,
+        @RequestBody CommentCreate commentUpdate,
+        @RequestHeader("Authorization") String authHeader
+    ) {
+        Integer userId = Utils.getUserId(authHeader).orElseThrow(BadAuthTokenException::new);
+        CommentResponse comment = service.updateComment(blogId, commentId, userId, commentUpdate);
+        return ResponseEntity.ok(comment);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Comment> updateComment(@PathVariable Integer id, @RequestBody Comment updatedComment) {
-        updatedComment.setId(id);
-        return ResponseEntity.ok(commentService.save(updatedComment));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteComment(@PathVariable Integer id) {
-        commentService.deleteById(id);
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<Void> deleteComment(
+        @PathVariable Integer blogId,
+        @PathVariable Integer commentId,
+        @RequestHeader("Authorization") String authHeader
+    ) {
+        Integer userId = Utils.getUserId(authHeader).orElseThrow(BadAuthTokenException::new);
+        service.deleteComment(blogId, commentId, userId);
         return ResponseEntity.noContent().build();
     }
 }

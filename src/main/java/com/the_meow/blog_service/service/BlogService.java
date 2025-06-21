@@ -22,11 +22,9 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class BlogService {
     private final BlogRepository repo;
-    private final BlogRatingRepository blogRatingRepository;
 
-    public BlogService(BlogRepository repo, BlogRatingRepository blogRatingRepository) {
+    public BlogService(BlogRepository repo) {
         this.repo = repo;
-        this.blogRatingRepository = blogRatingRepository;
     }
 
     public Page<BlogInfoPublic> getPublishedBlogs(BlogFilterRequest filter) {

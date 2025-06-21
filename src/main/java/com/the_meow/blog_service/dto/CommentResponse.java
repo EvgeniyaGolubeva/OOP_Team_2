@@ -10,7 +10,7 @@ import lombok.*;
 @Data
 @Builder
 @AllArgsConstructor
-public class CommentDTO {
+public class CommentResponse {
     private Integer id;
     private Integer ownerId;
     private Integer blogId;
@@ -19,7 +19,7 @@ public class CommentDTO {
     private LocalDateTime updatedAt;
     private Double averageRating;
 
-    public CommentDTO(Comment comment) {
+    public CommentResponse(Comment comment) {
         this.id = comment.getId();
         this.ownerId = comment.getUserId();
         this.blogId = comment.getBlog().getId();
