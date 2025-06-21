@@ -2,6 +2,8 @@ import java.util.*;
 import java.util.regex.*;
 import java.util.stream.Collectors;
 
+package com.example.blog;
+
 public class BlogService {
     private static final Set<String> STOP_WORDS = Set.of("и", "в", "на", "с", "от", "по");
 
