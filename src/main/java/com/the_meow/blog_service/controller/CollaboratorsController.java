@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.the_meow.blog_service.dto.CollaboratorsRequest;
+import com.the_meow.blog_service.exception.BadAuthTokenException;
 import com.the_meow.blog_service.service.CollaboratorsService;
+import com.the_meow.blog_service.utils.Utils;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +31,8 @@ public class CollaboratorsController {
         @Valid @RequestBody CollaboratorsRequest request,
         @RequestHeader("Authorization") String authHeader
     ) {
-
+        Integer userId = Utils.getUserId(authHeader).orElseThrow(BadAuthTokenException::new);
+        service.addCollaborators(blogId, request, userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -39,7 +42,8 @@ public class CollaboratorsController {
         @Valid @RequestBody CollaboratorsRequest request,
         @RequestHeader("Authorization") String authHeader
     ) {
-        
+        Integer userId = Utils.getUserId(authHeader).orElseThrow(BadAuthTokenException::new);
+        service.removeCollaborators(blogId, request, userId);
         return ResponseEntity.noContent().build();
     }
 }
