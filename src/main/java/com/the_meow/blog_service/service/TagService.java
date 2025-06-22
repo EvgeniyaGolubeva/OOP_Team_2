@@ -37,39 +37,51 @@ public class TagService {
         return tags;
     }
 
-    public Tag addTagToBlog(Integer blogId, String tagName) {
-        log.info("Adding tag '{}' to blog {}", tagName, blogId);
+    public void addTagToBlog(Integer blogId, String tagName, Integer userId) {
+        log.info("User {} is adding tag '{}' to blog {}", userId, tagName, blogId);
+    
         Blog blog = blogRepository.findById(blogId.longValue())
             .orElseThrow(() -> {
                 log.warn("Blog not found: id={}", blogId);
                 return new BlogNotFoundException(blogId);
             });
-
+    
+        if (!blog.getUserId().equals(userId)) {
+            throw new BadAuthTokenException();
+        }
+    
         Optional<Tag> existingTag = repo.findByBlogIdAndName(blogId, tagName);
         if (existingTag.isPresent()) {
             log.warn("Tag '{}' already exists for blog {}", tagName, blogId);
             throw new TagAlreadyExistsException(tagName, blogId);
         }
-
+    
         Tag tag = new Tag();
         tag.setBlog(blog);
         tag.setName(tagName);
-        Tag saved = repo.save(tag);
-        log.info("Tag '{}' added to blog {}", tagName, blogId);
-        return saved;
+        repo.save(tag);
+    
+        log.info("User {} added tag '{}' to blog {}", userId, tagName, blogId);
     }
     
-    public void deleteTagFromBlog(Integer blogId, String tagName) {
-        log.info("Deleting tag '{}' from blog {}", tagName, blogId);
+
+    public void deleteTagFromBlog(Integer blogId, String tagName, Integer userId) {
+        log.info("User {} is deleting tag '{}' from blog {}", userId, tagName, blogId);
+    
         Tag tag = repo.findByBlogIdAndName(blogId, tagName)
             .orElseThrow(() -> {
                 log.warn("Tag '{}' not found for blog {}", tagName, blogId);
                 return new TagNotFoundException(tagName, blogId);
             });
-
+    
+        if (!tag.getBlog().getUserId().equals(userId)) {
+            throw new BadAuthTokenException();
+        }
+    
         repo.delete(tag);
-        log.info("Tag '{}' deleted from blog {}", tagName, blogId);
+        log.info("User {} deleted tag '{}' from blog {}", userId, tagName, blogId);
     }
+    
 
     public List<String> searchTags(String name, String matchType) {
         log.info("Searching tags with name='{}' and matchType='{}'", name, matchType);
