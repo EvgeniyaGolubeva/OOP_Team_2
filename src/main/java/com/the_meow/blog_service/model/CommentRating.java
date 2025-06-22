@@ -29,7 +29,7 @@ public class CommentRating {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CommentRatingId implements Serializable {
-        private Integer comment;
+        private Integer commentId;
         private Integer userId;
     }
 }

@@ -9,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface BlogRatingRepository extends JpaRepository<BlogRating, BlogRatingId> {
-
     @Query("SELECT AVG(r.rating) FROM BlogRating r WHERE r.blog.id = :blogId")
     Double findAverageRatingByBlogId(@Param("blogId") Integer blogId);
 
