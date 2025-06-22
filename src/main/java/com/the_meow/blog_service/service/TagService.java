@@ -9,19 +9,15 @@ import com.the_meow.blog_service.model.*;
 import com.the_meow.blog_service.exception.*;
 import com.the_meow.blog_service.repository.*;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class TagService {
-
     private final TagRepository repo;
     private final BlogRepository blogRepository;
-
-    public TagService(TagRepository repo, BlogRepository blogRepository) {
-        this.repo = repo;
-        this.blogRepository = blogRepository;
-    }
 
     public List<String> getAllUniqueTags() {
         log.info("Fetching all unique tags");

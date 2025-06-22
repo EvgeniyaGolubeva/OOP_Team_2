@@ -9,15 +9,15 @@ import com.the_meow.blog_service.service.*;
 import com.the_meow.blog_service.utils.*;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/blogs/{blogId}/ratings")
 public class BlogRatingController {
     private final BlogRatingService service;
-
-    public BlogRatingController(BlogRatingService service) {
-        this.service = service;
-    }
 
     @GetMapping
     public ResponseEntity<RatingResponse> getRating(

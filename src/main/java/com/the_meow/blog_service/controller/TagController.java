@@ -7,19 +7,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.the_meow.blog_service.exception.BadAuthTokenException;
-import com.the_meow.blog_service.model.Tag;
 import com.the_meow.blog_service.service.TagService;
 import com.the_meow.blog_service.utils.Utils;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/blogs/{blogId}/tags")
 public class TagController {
-
     private final TagService service;
-
-    public TagController(TagService service) {
-        this.service = service;
-    }
 
     @GetMapping("/")
     public List<String> getTagsByBlogId(

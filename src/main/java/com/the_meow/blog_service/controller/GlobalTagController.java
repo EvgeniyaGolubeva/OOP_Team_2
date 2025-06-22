@@ -9,15 +9,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.the_meow.blog_service.service.TagService;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/tags")
 public class GlobalTagController {
-
     private final TagService service;
-
-    public GlobalTagController(TagService service) {
-        this.service = service;
-    }
 
     @GetMapping
     public List<String> getTags(

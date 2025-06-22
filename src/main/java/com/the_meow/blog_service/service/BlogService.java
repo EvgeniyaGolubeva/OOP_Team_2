@@ -16,16 +16,14 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class BlogService {
     private final BlogRepository repo;
-
-    public BlogService(BlogRepository repo) {
-        this.repo = repo;
-    }
 
     public Page<BlogInfoPublic> getPublishedBlogs(BlogFilterRequest filter) {
         log.info("Fetching published blogs with filter: {}", filter);

@@ -1,5 +1,6 @@
 package com.the_meow.blog_service.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -10,14 +11,10 @@ import com.the_meow.blog_service.repository.*;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class BlogRatingService {
     private final BlogRatingRepository repo;
     private final BlogRepository blogRepository;
-
-    public BlogRatingService(BlogRatingRepository repo, BlogRepository blogRepository) {
-        this.repo = repo;
-        this.blogRepository = blogRepository;
-    }
 
     public RatingResponse getRating(Integer blogId, Integer userId) {
         log.debug("Getting rating for blog {} by user {}", blogId, userId);

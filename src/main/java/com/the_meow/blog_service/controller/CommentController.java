@@ -6,20 +6,20 @@ import com.the_meow.blog_service.exception.BadAuthTokenException;
 import com.the_meow.blog_service.service.CommentService;
 import com.the_meow.blog_service.utils.Utils;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/blogs/{blogId}/comments")
 public class CommentController {
-
     private final CommentService service;
-
-    public CommentController(CommentService service) {
-        this.service = service;
-    }
 
     @GetMapping
     public ResponseEntity<List<CommentResponse>> getComments(

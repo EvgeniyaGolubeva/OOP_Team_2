@@ -6,8 +6,11 @@ import com.the_meow.blog_service.exception.*;
 import com.the_meow.blog_service.repository.*;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CommentRatingService {

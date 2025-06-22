@@ -6,6 +6,8 @@ import com.the_meow.blog_service.service.BlogService;
 import com.the_meow.blog_service.utils.Utils;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.Map;
@@ -16,15 +18,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/blogs")
 public class BlogController {
-
     private final BlogService service;
-
-    public BlogController(BlogService service) {
-        this.service = service;
-    }
 
     @GetMapping
     public Page<BlogInfoPublic> getAllPublishedBlogs(@ModelAttribute BlogFilterRequest filter) {
