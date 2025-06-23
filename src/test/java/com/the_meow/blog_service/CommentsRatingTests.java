@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @ExtendWith(MockitoExtension.class)
-class CommentRatingControllerTest {
+class CommentRatingTests {
 
     private MockMvc mockMvc;
     private ObjectMapper mapper;
