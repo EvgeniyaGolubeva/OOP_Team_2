@@ -3,6 +3,7 @@ package com.the_meow.blog_service.model;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -30,15 +31,26 @@ public class Blog {
 
     private LocalDateTime updatedAt;
 
+    @Builder.Default
+    @ElementCollection
+    @Column(name = "user_id")
+    @CollectionTable(name = "blog_collaborators", joinColumns = @JoinColumn(name = "blog_id"))
+    private List<Integer> collaborators = new ArrayList<>();
+
+
+    @Builder.Default
     private Boolean isPublished = false;
 
     private LocalDateTime publishedAt;
 
+    @Builder.Default
     private Integer readCount = 0;
 
+    @Singular
     @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
+    @Singular
     @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tag> tags;
 

@@ -8,6 +8,7 @@ import java.util.Set;
 @Entity
 @Table(name = "comments")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Comment {
@@ -30,4 +31,6 @@ public class Comment {
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CommentRating> commentRatings;
+
+    private Comment comment;
 }

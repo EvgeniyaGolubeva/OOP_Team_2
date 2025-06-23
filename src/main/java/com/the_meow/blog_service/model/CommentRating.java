@@ -23,13 +23,13 @@ public class CommentRating {
 
     @Min(0)
     @Max(5)
-    private Float rating;
+    private Double rating;
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CommentRatingId implements Serializable {
-        private Integer comment;
+        private Integer commentId;
         private Integer userId;
     }
 }

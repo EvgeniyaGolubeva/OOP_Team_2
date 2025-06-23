@@ -24,7 +24,7 @@ public class BlogRating {
 
     @Min(0)
     @Max(5)
-    private Float rating;
+    private Double rating;
 
     @Data
     @NoArgsConstructor
