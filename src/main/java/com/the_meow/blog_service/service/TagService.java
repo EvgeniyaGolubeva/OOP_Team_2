@@ -33,6 +33,17 @@ public class TagService {
         return tags;
     }
 
+    private void verifyOwnershipOrCollaborator(Blog blog, Integer userId) {
+        boolean isOwner = blog.getUserId().equals(userId);
+        boolean isCollaborator = blog.getCollaborators() != null && blog.getCollaborators().contains(userId);
+    
+        if (!isOwner && !(isCollaborator && Boolean.FALSE.equals(blog.getIsPublished()))) {
+            log.warn("User {} forbidden to modify blog {}", userId, blog.getId());
+            throw new ForbiddenBlogAccessException(blog.getId(), userId);
+        }
+    }
+
+
     public void addTagToBlog(Integer blogId, String tagName, Integer userId) {
         log.info("User {} is adding tag '{}' to blog {}", userId, tagName, blogId);
     
@@ -42,9 +53,7 @@ public class TagService {
                 return new BlogNotFoundException(blogId);
             });
     
-        if (!blog.getUserId().equals(userId)) {
-            throw new BadAuthTokenException();
-        }
+        verifyOwnershipOrCollaborator(blog, userId);
     
         Optional<Tag> existingTag = repo.findByBlogIdAndName(blogId, tagName);
         if (existingTag.isPresent()) {
@@ -60,7 +69,6 @@ public class TagService {
         log.info("User {} added tag '{}' to blog {}", userId, tagName, blogId);
     }
     
-
     public void deleteTagFromBlog(Integer blogId, String tagName, Integer userId) {
         log.info("User {} is deleting tag '{}' from blog {}", userId, tagName, blogId);
     
@@ -70,14 +78,11 @@ public class TagService {
                 return new TagNotFoundException(tagName, blogId);
             });
     
-        if (!tag.getBlog().getUserId().equals(userId)) {
-            throw new BadAuthTokenException();
-        }
+        verifyOwnershipOrCollaborator(tag.getBlog(), userId);
     
         repo.delete(tag);
         log.info("User {} deleted tag '{}' from blog {}", userId, tagName, blogId);
     }
-    
 
     public List<String> searchTags(String name, String matchType) {
         log.info("Searching tags with name='{}' and matchType='{}'", name, matchType);

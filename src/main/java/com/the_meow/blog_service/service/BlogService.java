@@ -84,7 +84,7 @@ public class BlogService {
         }
 
         return blog;
-    }    
+    }
 
     public BlogInfoOwner createNewBlog(Integer userId, BlogCreateRequest request) throws IOException {
         log.info("User {} creating new blog with title '{}'", userId, request.getTitle());
@@ -129,18 +129,34 @@ public class BlogService {
     }
 
     public BlogInfoOwner updateBlog(Integer blogId, Integer userId, BlogCreateRequest request) throws IOException {
-        log.info("User {} updating blog {}", userId, blogId);
-        Blog blog = findBlogOwnedBy(blogId, userId);
-
-        blog.setTitle(request.getTitle() != null ? request.getTitle() : blog.getTitle());
-        blog.setThumbnailUrl(request.getThumbnailUrl() != null ? request.getThumbnailUrl() : blog.getThumbnailUrl());
-        blog.setContent(request.getContent() != null ? Utils.compressText(request.getContent()) : blog.getContent());
+        log.info("User {} attempting to update blog {}", userId, blogId);
+    
+        Blog blog = repo.findById(blogId.longValue())
+            .orElseThrow(() -> new BlogNotFoundException(blogId));
+    
+        boolean isOwner = blog.getUserId().equals(userId);
+        boolean isCollaborator = blog.getCollaborators() != null && blog.getCollaborators().contains(userId);
+    
+        if (!isOwner && !isCollaborator) {
+            log.warn("User {} not authorized to update blog {}", userId, blogId);
+            throw new ForbiddenException("You are not allowed to update this blog");
+        }
+    
+        if (!isOwner && blog.getIsPublished() != null && blog.getIsPublished()) {
+            log.warn("Collaborator {} cannot edit published blog {}", userId, blogId);
+            throw new ForbiddenException("Collaborators cannot edit published blogs");
+        }
+    
+        if (request.getTitle() != null) blog.setTitle(request.getTitle());
+        if (request.getThumbnailUrl() != null) blog.setThumbnailUrl(request.getThumbnailUrl());
+        if (request.getContent() != null) blog.setContent(Utils.compressText(request.getContent()));
+    
         blog.setIsPublished(false);
         blog.setUpdatedAt(LocalDateTime.now());
-
+    
         repo.save(blog);
-        log.info("Blog {} updated", blogId);
-
+        log.info("Blog {} updated by user {}", blogId, userId);
+    
         return new BlogInfoOwner(blog);
     }
 
@@ -200,10 +216,21 @@ public class BlogService {
                 log.warn("Blog with id={} not found", blogId);
                 return new BlogNotFoundException(blogId);
             });
-        
-        if (userId.isPresent() && blog.getUserId().equals(userId.get())) {
-            log.debug("Returning owner view of blog {}", blogId);
-            return new BlogOwner(blog);
+    
+        if (userId.isPresent()) {
+            Integer uid = userId.get();
+    
+            if (blog.getUserId().equals(uid)) {
+                log.debug("Returning owner view of blog {}", blogId);
+                return new BlogOwner(blog);
+            }
+    
+            if (blog.getCollaborators() != null && blog.getCollaborators().contains(uid)) {
+                if (Boolean.FALSE.equals(blog.getIsPublished())) {
+                    log.debug("Returning collaborator view of blog {}", blogId);
+                    return new BlogOwner(blog);
+                }
+            }
         }
     
         if (Boolean.TRUE.equals(blog.getIsPublished())) {
