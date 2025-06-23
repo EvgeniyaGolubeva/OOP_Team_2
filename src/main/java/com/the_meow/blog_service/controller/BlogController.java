@@ -4,7 +4,7 @@ import com.the_meow.blog_service.dto.*;
 import com.the_meow.blog_service.exception.BadAuthTokenException;
 import com.the_meow.blog_service.service.BlogService;
 import com.the_meow.blog_service.utils.CompressionUtils;
-import com.the_meow.blog_service.utils.MarkdownUtils;
+import com.the_meow.blog_service.utils.MarkdownUtil;
 import com.the_meow.blog_service.utils.Utils;
 
 import jakarta.validation.Valid;
@@ -66,7 +66,7 @@ public class BlogController {
                 b.getTitle(),
                 b.getTitle(),
                 b.getIsPublished() != null ? b.getPublishedAt().toString() : "Unpublished",
-                MarkdownUtils.markdownToHtml(
+                MarkdownUtil.markdownToHtml(
                     CompressionUtils.decompressText(
                         b.getContent()
                     )
@@ -87,7 +87,7 @@ public class BlogController {
                 b.getTitle(),
                 b.getTitle(),
                 b.getPublishedAt().toString(),
-                MarkdownUtils.markdownToHtml(
+                MarkdownUtil.markdownToHtml(
                     CompressionUtils.decompressText(
                         b.getContent()
                     )
