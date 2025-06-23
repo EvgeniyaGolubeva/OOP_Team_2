@@ -11,8 +11,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class NotificationUtilTest {
 
+
+    /** SCENARIO-001: Single recipient – happy path. */
     @Test
-    void testHappyPathNotifyUsers() {
+    void testNotifyUser() {
         ArrayList<String> emails = new ArrayList<>(List.of("user@example.com"));
 
         // We won't actually send the request here, but we expect no exception
@@ -21,6 +23,15 @@ class NotificationUtilTest {
         });
     }
 
+    /** SCENARIO-002: Multiple recipients – happy path. */
+    @Test
+    void testMultipleRecipientsNoException() {
+        ArrayList<String> recipients = new ArrayList<>(List.of("a@test.com", "b@test.com", "c@test.com"));
+        assertDoesNotThrow(() -> NotificationUtil.fake_notify_users(recipients),
+                           "fake_notify_users should handle multiple recipients");
+    }
+
+    /** SCENARIO-004: Invalid URI configured – should not throw. */
     @Test
     void testNotifyUsersWithInvalidUri() {
         ArrayList<String> emails = new ArrayList<>(List.of("test@test.com"));
@@ -31,6 +42,8 @@ class NotificationUtilTest {
         });
     }
 
+
+    /** Aditional test for invalid URIs */
     @Test
     void testFakeNotifyPrintsMessage() {
         ArrayList<String> ids = new ArrayList<>(List.of("123", "456"));
@@ -39,6 +52,7 @@ class NotificationUtilTest {
         });
     }
 
+    /** SCENARIO-005: Simulated server error – should not throw. */
     @Test
     void testNotifyUsersHandlesServerError() {
         // Since real HTTP is not easily mockable without changing the method,
@@ -48,5 +62,13 @@ class NotificationUtilTest {
         assertDoesNotThrow(() -> {
             NotificationUtil.fake_notify_users(ids);
         });
+    }
+
+    /** SCENARIO-003: Empty list – edge case, no-op. */
+    @Test
+    void testEmptyListNoException() {
+        ArrayList<String> recipients = new ArrayList<>();
+        assertDoesNotThrow(() -> NotificationUtil.fake_notify_users(recipients),
+                           "Empty list should be a no-op");
     }
 }

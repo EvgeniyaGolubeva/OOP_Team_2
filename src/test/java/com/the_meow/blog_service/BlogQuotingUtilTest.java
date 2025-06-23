@@ -96,6 +96,18 @@ class BlogQuotingUtilTest {
         assertEquals(List.of(4L, 11L, 19L), result);
     }
 
+    @Test
+    void testQuoteOverlappingAnotherQuote() {
+        Blog blog = new Blog();
+        blog.setContent("one two three");
+        when(blogRepository.findById(13L)).thenReturn(Optional.of(blog));
+
+        String input = "[[(13) one two]] and [[(13) two three]]";
+        List<Long> result = quotingUtil.validateQuotedBlogs(input);
+
+        assertEquals(List.of(13L, 1L, 8L, 13L, 5L, 14L), result);
+    }
+
     // NEGATIVE TEST CASES
 
     @Test
@@ -201,17 +213,5 @@ class BlogQuotingUtilTest {
 
         String input = "[[(12)     ]]";
         assertNull(quotingUtil.validateQuotedBlogs(input));
-    }
-
-    @Test
-    void testQuoteOverlappingAnotherQuote() {
-        Blog blog = new Blog();
-        blog.setContent("one two three");
-        when(blogRepository.findById(13L)).thenReturn(Optional.of(blog));
-
-        String input = "[[(13) one two]] and [[(13) two three]]";
-        List<Long> result = quotingUtil.validateQuotedBlogs(input);
-
-        assertEquals(List.of(13L, 1L, 8L, 13L, 5L, 14L), result);
     }
 }
