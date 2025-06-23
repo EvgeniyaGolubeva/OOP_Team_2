@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class UserBlogService {
-    private BlogRepository repo;
+    private final BlogRepository repo;
 
         public List<?> getBlogs(Integer ownerId, Optional<Integer> viewerId) {
         log.info("Fetching blogs for ownerId={} requested by user={}", ownerId, viewerId.orElse(null));

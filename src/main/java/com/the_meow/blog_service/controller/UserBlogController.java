@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/users/")
 public class UserBlogController {
-    private UserBlogService service;
+    private final UserBlogService service;
 
     @GetMapping("/{ownerId}/blogs/")
     public ResponseEntity<List<?>> getBlogs(
