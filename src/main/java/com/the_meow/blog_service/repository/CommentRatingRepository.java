@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CommentRatingRepository extends JpaRepository<CommentRating, CommentRatingId> {
     @Query("SELECT AVG(r.rating) FROM CommentRating r WHERE r.comment.id = :commentId")
-    Float getAverageRatingByCommentId(@Param("commentId") Integer commentId);
+    Double getAverageRatingByCommentId(@Param("commentId") Integer commentId);
 
     @Query("SELECT COUNT(r) FROM CommentRating r WHERE r.comment.id = :commentId")
     Integer countByCommentId(@Param("commentId") Integer commentId);

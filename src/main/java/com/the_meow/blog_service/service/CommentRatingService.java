@@ -35,14 +35,13 @@ public class CommentRatingService {
     public RatingResponse getRatingsByCommentId(Integer blogId, Integer commentId, Integer userId) {
         Comment comment = getValidatedComment(blogId, commentId);
 
-        Float avg = repo.getAverageRatingByCommentId(comment.getId());
+        Double avg = repo.getAverageRatingByCommentId(comment.getId());
         Integer total = repo.countByCommentId(comment.getId());
 
-        Integer userRating = null;
+        Double userRating = null;
         if (userId != null) {
             userRating = repo.findByCommentIdAndUserId(comment.getId(), userId)
                 .map(CommentRating::getRating)
-                .map(Float::intValue)
                 .orElse(null);
         }
 
@@ -53,7 +52,6 @@ public class CommentRatingService {
         );
     }
 
-
     public void submitRating(Integer blogId, Integer commentId, Integer userId, RatingRequest ratingRequest) {
         Comment comment = getValidatedComment(blogId, commentId);
         CommentRating.CommentRatingId id = new CommentRating.CommentRatingId(comment.getId(), userId);
@@ -62,7 +60,7 @@ public class CommentRatingService {
             throw new AlreadyRatedException();
         }
 
-        CommentRating rating = new CommentRating(comment, userId, ratingRequest.getRating().floatValue());
+        CommentRating rating = new CommentRating(comment, userId, ratingRequest.getRating());
         repo.save(rating);
     }
 
@@ -76,7 +74,7 @@ public class CommentRatingService {
                 return new RatingNotFoundException();
             });
 
-        rating.setRating(ratingRequest.getRating().floatValue());
+        rating.setRating(ratingRequest.getRating());
         repo.save(rating);
     }
 

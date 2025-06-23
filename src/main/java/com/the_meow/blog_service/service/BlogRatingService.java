@@ -21,17 +21,16 @@ public class BlogRatingService {
         Double avg = repo.findAverageRatingByBlogId(blogId);
         Integer total = repo.countByBlogId(blogId);
 
-        Integer userRating = null;
+        Double userRating = null;
         if (userId != null) {
             userRating = repo.findByBlogIdAndUserId(blogId, userId)
                 .map(BlogRating::getRating)
-                .map(Float::intValue)
                 .orElse(null);
         }
 
         log.info("Rating for blog {}: avg={}, total={}, userRating={}", blogId, avg, total, userRating);
         return new RatingResponse(
-            avg != null ? avg : 0.0,
+            avg = avg != null ? avg : 0.0,
             total != null ? total : 0,
             userRating
         );
@@ -51,7 +50,7 @@ public class BlogRatingService {
             throw new AlreadyRatedException();
         }
 
-        BlogRating rating = new BlogRating(blog, userId, ratingRequest.getRating().floatValue());
+        BlogRating rating = new BlogRating(blog, userId, ratingRequest.getRating());
         repo.save(rating);
         log.info("Rating saved for blog {} by user {}", blogId, userId);
     }
@@ -64,7 +63,7 @@ public class BlogRatingService {
                 return new RatingNotFoundException();
             });
 
-        rating.setRating(ratingRequest.getRating().floatValue());
+        rating.setRating(ratingRequest.getRating());
         repo.save(rating);
         log.info("Rating updated for blog {} by user {}", blogId, userId);
     }

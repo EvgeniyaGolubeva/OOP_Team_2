@@ -1,25 +1,16 @@
 package com.the_meow.blog_service.dto;
 
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class RatingRequest {
-
-    @NotNull
     @Min(1)
     @Max(5)
-    private Integer rating;
-
-    public RatingRequest() {}
-
-    public RatingRequest(Integer rating) {
-        this.rating = rating;
-    }
-
-    public Integer getRating() {
-        return rating;
-    }
-
-    public void setRating(Integer rating) {
-        this.rating = rating;
-    }
+    @NotNull
+    private double rating;
 }
