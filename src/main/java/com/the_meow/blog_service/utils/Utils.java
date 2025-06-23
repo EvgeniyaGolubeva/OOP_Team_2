@@ -9,18 +9,18 @@ import com.the_meow.blog_service.model.CommentRating;
 public class Utils {
     public static Optional<Integer> getUserId(String token) {
         if (token == null) {
-            return Optional.of(null);
+            return Optional.empty();
         }
 
         if (token.isBlank()) {
-            return Optional.of(null);
+            return Optional.empty();
         }
 
         try {
-            return Optional.of(Integer.parseInt(token));
+            return Optional.ofNullable(Integer.parseInt(token));
         }
         catch (NumberFormatException e) {
-            return Optional.of(null);
+            return Optional.empty();
         }
     }
 

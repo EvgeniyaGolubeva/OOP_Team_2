@@ -1,6 +1,6 @@
 package com.the_meow.blog_service;
 
-import com.the_meow.blog_service.utils.CompressionUtil;
+import com.the_meow.blog_service.utils.CompressionUtils;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -11,9 +11,9 @@ class CompressionUtilTest {
 
     @Test
     void testHappyPathCompressDecompress() throws IOException {
-        String longText = "ABC".repeat(100); // >70 characters
-        String compressed = CompressionUtil.compress(longText);
-        String decompressed = CompressionUtil.decompress(compressed);
+        String longText = "ABC".repeat(100); // >100 characters
+        String compressed = CompressionUtils.compressText(longText);
+        String decompressed = CompressionUtils.decompressText(compressed);
 
         assertNotEquals(longText, compressed);
         assertEquals(longText, decompressed);
@@ -21,8 +21,8 @@ class CompressionUtilTest {
 
     @Test
     void testShortInputNotCompressed() throws IOException {
-        String shortText = "Short text under 70 characters.";
-        String compressed = CompressionUtil.compress(shortText);
+        String shortText = "Short text under 100 characters.";
+        String compressed = CompressionUtils.compressText(shortText);
 
         assertEquals(shortText, compressed); // should return as-is
     }
@@ -31,7 +31,7 @@ class CompressionUtilTest {
     void testInvalidBase64ThrowsException() {
         String badBase64 = "this_is_not_base64!";
         assertThrows(IllegalArgumentException.class, () -> {
-            CompressionUtil.decompress(badBase64);
+            CompressionUtils.decompressText(badBase64);
         });
     }
 
@@ -40,7 +40,7 @@ class CompressionUtilTest {
         // This string is Base64 but decodes to plain text, not gzip
         String base64Text = Base64.getEncoder().encodeToString("not compressed".getBytes());
         assertThrows(IOException.class, () -> {
-            CompressionUtil.decompress(base64Text);
+            CompressionUtils.decompressText(base64Text);
         });
     }
 }

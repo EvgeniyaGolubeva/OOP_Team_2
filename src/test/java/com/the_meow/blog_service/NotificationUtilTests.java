@@ -2,8 +2,6 @@ package com.the_meow.blog_service;
 
 import com.the_meow.blog_service.utils.NotificationUtil;
 import org.junit.jupiter.api.Test;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 

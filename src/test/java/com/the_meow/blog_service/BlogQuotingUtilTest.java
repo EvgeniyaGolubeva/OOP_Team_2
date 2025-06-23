@@ -33,7 +33,7 @@ class BlogQuotingUtilTest {
         Blog blog = new Blog();
         blog.setContent("This is a quoted part.");
 
-        when(blogRepository.findById(1L)).thenReturn(Optional.of(blog));
+        when(blogRepository.findById(1L)).thenReturn(Optional.ofNullable(blog));
 
         String input = "[[(1) quoted part]]";
         List<Long> result = quotingUtil.validateQuotedBlogs(input);
@@ -46,7 +46,7 @@ class BlogQuotingUtilTest {
         Blog blog = new Blog();
         blog.setContent("first second third");
 
-        when(blogRepository.findById(1L)).thenReturn(Optional.of(blog));
+        when(blogRepository.findById(1L)).thenReturn(Optional.ofNullable(blog));
 
         String input = "[[(1) first]] and [[(1) second]] and [[(1) third]]";
         List<Long> result = quotingUtil.validateQuotedBlogs(input);
@@ -61,8 +61,8 @@ class BlogQuotingUtilTest {
         Blog blog2 = new Blog();
         blog2.setContent("cat dog");
 
-        when(blogRepository.findById(1L)).thenReturn(Optional.of(blog1));
-        when(blogRepository.findById(2L)).thenReturn(Optional.of(blog2));
+        when(blogRepository.findById(1L)).thenReturn(Optional.ofNullable(blog1));
+        when(blogRepository.findById(2L)).thenReturn(Optional.ofNullable(blog2));
 
         String input = "[[(1) apple]] then [[(2) dog]]";
         List<Long> result = quotingUtil.validateQuotedBlogs(input);
@@ -75,7 +75,7 @@ class BlogQuotingUtilTest {
         Blog blog = new Blog();
         blog.setContent("Start and middle and end.");
 
-        when(blogRepository.findById(3L)).thenReturn(Optional.of(blog));
+        when(blogRepository.findById(3L)).thenReturn(Optional.ofNullable(blog));
 
         String input = "[[(3) Start]]";
         List<Long> result = quotingUtil.validateQuotedBlogs(input);
@@ -88,7 +88,7 @@ class BlogQuotingUtilTest {
         Blog blog = new Blog();
         blog.setContent("The final quote is here.");
 
-        when(blogRepository.findById(4L)).thenReturn(Optional.of(blog));
+        when(blogRepository.findById(4L)).thenReturn(Optional.ofNullable(blog));
 
         String input = "  something  [[(4) quote is]]  ";
         List<Long> result = quotingUtil.validateQuotedBlogs(input);
@@ -109,7 +109,7 @@ class BlogQuotingUtilTest {
     void testBlogWithNullContent() {
         Blog blog = new Blog();
         blog.setContent(null);
-        when(blogRepository.findById(5L)).thenReturn(Optional.of(blog));
+        when(blogRepository.findById(5L)).thenReturn(Optional.ofNullable(blog));
 
         String input = "[[(5) anything]]";
         assertNull(quotingUtil.validateQuotedBlogs(input));
@@ -119,7 +119,7 @@ class BlogQuotingUtilTest {
     void testQuotedTextNotInContent() {
         Blog blog = new Blog();
         blog.setContent("This blog does not contain it.");
-        when(blogRepository.findById(6L)).thenReturn(Optional.of(blog));
+        when(blogRepository.findById(6L)).thenReturn(Optional.ofNullable(blog));
 
         String input = "[[(6) not found text]]";
         assertNull(quotingUtil.validateQuotedBlogs(input));
@@ -165,7 +165,7 @@ class BlogQuotingUtilTest {
     void testBlogIdPresentButContentIsEmpty() {
         Blog blog = new Blog();
         blog.setContent("");
-        when(blogRepository.findById(9L)).thenReturn(Optional.of(blog));
+        when(blogRepository.findById(9L)).thenReturn(Optional.ofNullable(blog));
 
         String input = "[[(9) something]]";
         assertNull(quotingUtil.validateQuotedBlogs(input));
@@ -175,7 +175,7 @@ class BlogQuotingUtilTest {
     void testMultipleQuotesOneInvalid() {
         Blog blog = new Blog();
         blog.setContent("hello world");
-        when(blogRepository.findById(10L)).thenReturn(Optional.of(blog));
+        when(blogRepository.findById(10L)).thenReturn(Optional.ofNullable(blog));
 
         String input = "[[(10) hello]] and [[(10) notfound]]";
         List<Long> result = quotingUtil.validateQuotedBlogs(input);
@@ -187,7 +187,7 @@ class BlogQuotingUtilTest {
     void testAllQuotesInvalid() {
         Blog blog = new Blog();
         blog.setContent("nothing matches");
-        when(blogRepository.findById(11L)).thenReturn(Optional.of(blog));
+        when(blogRepository.findById(11L)).thenReturn(Optional.ofNullable(blog));
 
         String input = "[[(11) nope]] [[(11) neither]]";
         assertNull(quotingUtil.validateQuotedBlogs(input));
@@ -197,7 +197,7 @@ class BlogQuotingUtilTest {
     void testQuoteWithOnlyWhitespace() {
         Blog blog = new Blog();
         blog.setContent("anything");
-        when(blogRepository.findById(12L)).thenReturn(Optional.of(blog));
+        when(blogRepository.findById(12L)).thenReturn(Optional.ofNullable(blog));
 
         String input = "[[(12)     ]]";
         assertNull(quotingUtil.validateQuotedBlogs(input));
@@ -207,7 +207,7 @@ class BlogQuotingUtilTest {
     void testQuoteOverlappingAnotherQuote() {
         Blog blog = new Blog();
         blog.setContent("one two three");
-        when(blogRepository.findById(13L)).thenReturn(Optional.of(blog));
+        when(blogRepository.findById(13L)).thenReturn(Optional.ofNullable(blog));
 
         String input = "[[(13) one two]] and [[(13) two three]]";
         List<Long> result = quotingUtil.validateQuotedBlogs(input);
