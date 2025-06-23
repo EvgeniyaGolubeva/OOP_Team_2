@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.IOException;
 import java.util.Base64;
 
-class CompressionUtilTest {
+class CompressionUtilTests {
 
     /**
      * SCENARIO-001: Compress/decompress long text (> 70 chars).

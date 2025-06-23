@@ -9,7 +9,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class NotificationUtilTest {
+class NotificationUtilTests {
 
 
     /** SCENARIO-001: Single recipient – happy path. */
