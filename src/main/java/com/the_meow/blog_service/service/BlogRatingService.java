@@ -30,7 +30,7 @@ public class BlogRatingService {
 
         log.info("Rating for blog {}: avg={}, total={}, userRating={}", blogId, avg, total, userRating);
         return new RatingResponse(
-            avg = avg != null ? avg : 0.0,
+            avg != null ? avg : 0.0,
             total != null ? total : 0,
             userRating
         );
