@@ -1,6 +1,5 @@
 package com.the_meow.blog_service.utils;
 
-import com.the_meow.blog_service.model.Blog;
 import jakarta.mail.internet.InternetAddress;
 
 import java.util.ArrayList;
