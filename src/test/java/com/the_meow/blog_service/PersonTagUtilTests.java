@@ -8,7 +8,7 @@ import java.io.PrintStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class PersonTagUtilTest {
+class PersonTagUtilTests {
     @Test
     void testIsValidEmail_validEmail() {
         assertTrue(PersonTagUtil.isValidEmail("john.doe@example.com"));
