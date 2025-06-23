@@ -29,7 +29,7 @@ public class Utils {
             .map(BlogRating::getRating)
             .map(Double::valueOf)
             .mapToDouble(Double::doubleValue)
-            .average().getAsDouble();
+            .average().orElse(0.0);
     }
 
     public static Double getAvgCommentRating(Collection<CommentRating> ratings) {
