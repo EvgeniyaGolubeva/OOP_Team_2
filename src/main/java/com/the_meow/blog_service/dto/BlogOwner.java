@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import com.the_meow.blog_service.model.Blog;
 import com.the_meow.blog_service.model.Tag;
+import com.the_meow.blog_service.utils.CompressionUtils;
 import com.the_meow.blog_service.utils.Utils;
 
 import lombok.*;
@@ -30,7 +31,7 @@ public class BlogOwner {
     public BlogOwner(Blog blog) {
         this.id = blog.getId();
         this.title = blog.getTitle();
-        this.content = Utils.decompressText(blog.getContent());
+        this.content = CompressionUtils.decompressText(blog.getContent());
         this.ownerId = blog.getUserId();
         this.thumbnailUrl = blog.getThumbnailUrl();
         this.createdAt = blog.getCreatedAt();

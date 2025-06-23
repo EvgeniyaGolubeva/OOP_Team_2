@@ -4,7 +4,7 @@ import com.the_meow.blog_service.dto.*;
 import com.the_meow.blog_service.model.*;
 import com.the_meow.blog_service.exception.*;
 import com.the_meow.blog_service.repository.*;
-import com.the_meow.blog_service.utils.Utils;
+import com.the_meow.blog_service.utils.*;
 
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -94,7 +94,7 @@ public class BlogService {
             throw new DuplicateTitleException(request.getTitle(), userId);
         }
 
-        String content = Utils.compressText(Optional.ofNullable(request.getContent()).orElse(""));
+        String content = CompressionUtils.compressText(Optional.ofNullable(request.getContent()).orElse(""));
 
         Blog blog = Blog.builder()
             .title(request.getTitle())
@@ -149,7 +149,7 @@ public class BlogService {
     
         if (request.getTitle() != null) blog.setTitle(request.getTitle());
         if (request.getThumbnailUrl() != null) blog.setThumbnailUrl(request.getThumbnailUrl());
-        if (request.getContent() != null) blog.setContent(Utils.compressText(request.getContent()));
+        if (request.getContent() != null) blog.setContent(CompressionUtils.compressText(request.getContent()));
     
         blog.setIsPublished(false);
         blog.setUpdatedAt(LocalDateTime.now());

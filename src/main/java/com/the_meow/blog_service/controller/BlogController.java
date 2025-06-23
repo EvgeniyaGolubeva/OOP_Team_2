@@ -3,6 +3,8 @@ package com.the_meow.blog_service.controller;
 import com.the_meow.blog_service.dto.*;
 import com.the_meow.blog_service.exception.BadAuthTokenException;
 import com.the_meow.blog_service.service.BlogService;
+import com.the_meow.blog_service.utils.CompressionUtils;
+import com.the_meow.blog_service.utils.MarkdownUtils;
 import com.the_meow.blog_service.utils.Utils;
 
 import jakarta.validation.Valid;
@@ -15,6 +17,7 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,6 +41,64 @@ public class BlogController {
         Optional<Integer> userId = Utils.getUserId(authHeader);
         Object blog = service.getBlog(userId, id);
         return ResponseEntity.ok(blog);
+    }
+
+    @GetMapping("/{blogId}/html")
+    public ResponseEntity<String> getBlogHTML(
+        @PathVariable Integer blogId,
+        @RequestHeader("Authorization") String authHeader
+    ) {
+        Optional<Integer> userId = Utils.getUserId(authHeader);
+        Object blog = service.getBlog(userId, blogId);
+
+        String html = null;
+        if (blog instanceof BlogOwner b) {
+            html = """
+                <html>
+                    <head><title>%s</title></head>
+                    <body>
+                        <h1>%s</h1>
+                        <p><em>Published: %s</em></p>
+                        <div>%s</div>
+                    </body>
+                </html>
+            """.formatted(
+                b.getTitle(),
+                b.getTitle(),
+                b.getIsPublished() != null ? b.getPublishedAt().toString() : "Unpublished",
+                MarkdownUtils.markdownToHtml(
+                    CompressionUtils.decompressText(
+                        b.getContent()
+                    )
+                )
+            );
+        }
+        else if (blog instanceof BlogPublic b) {
+            html = """
+                <html>
+                    <head><title>%s</title></head>
+                    <body>
+                        <h1>%s</h1>
+                        <p><em>Published: %s</em></p>
+                        <div>%s</div>
+                    </body>
+                </html>
+            """.formatted(
+                b.getTitle(),
+                b.getTitle(),
+                b.getPublishedAt().toString(),
+                MarkdownUtils.markdownToHtml(
+                    CompressionUtils.decompressText(
+                        b.getContent()
+                    )
+                )
+            );
+        }
+
+        return ResponseEntity
+        .ok()
+        .header("Content-Type", MediaType.TEXT_HTML_VALUE)
+        .body(html);
     }
 
     @PostMapping
